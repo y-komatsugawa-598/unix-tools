@@ -1,0 +1,15 @@
+#!/bin/sh
+
+### このスクリプトについて
+# 概要     : emacs --daemon が起動していないか一定間隔で確認し、起動していない場合起動するスクリプト
+# 使用方法 : 単純にこのスクリプトを実行する
+# 備考     : `emacs --daemon` のコマンド名で判定しているので、使用する場合このスクリプトからの起動で統一するのが良い。
+
+is_emacs_daemon_alive () {
+    ps aux | grep -v grep | grep 'emacs --daemon' > /dev/null 2>&1
+}
+
+while true; do
+    is_emacs_daemon_alive || emacs --daemon
+    sleep 1
+done

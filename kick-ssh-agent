@@ -1,0 +1,24 @@
+#!/bin/sh
+
+### このスクリプトについて
+# 概要     : ssh-agent が起動していないか一定間隔で確認し、起動していない場合起動するスクリプト
+# 使用方法 : 単純にこのスクリプトを実行する
+# 備考     : socketのパスなどに特有の決めが入っているので、使用する場合このスクリプトからの起動で統一するのが良い。
+
+AGENT_SOCK=~/.ssh/agent_socket; export=AGENT_SOCK
+AGENT_CONF=~/.ssh/agent_config; export=AGENT_CONF
+
+is_agent_alive () {
+    ps -o comm= -p $SSH_AGENT_PID | grep ssh-agent 1> /dev/null 2>&1
+}
+
+while true; do
+    . $AGENT_CONF
+
+    if ! is_agent_alive; then
+        rm -f $AGENT_CONF $AGENT_SOCK
+        ssh-agent -a $AGENT_SOCK | grep -v 'echo' > $AGENT_CONF
+    fi
+
+    sleep 1
+done
